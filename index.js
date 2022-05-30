@@ -1,40 +1,26 @@
+import { apiKey } from "./environment/key.js"
 
 const moviesContainer = document.querySelector('.movies-container');
 
-const movies = [
-    {
-        img: 'https://img.elo7.com.br/product/original/3FBA809/big-poster-filme-batman-2022-90x60-cm-lo002-poster-batman.jpg',
-        title: 'Batman',
-        rating: 9.2,
-        year: 2022,
-        description: "Descrição do filme…",
-        isFavorited: true,
-    },
-    {
-        img: 'https://upload.wikimedia.org/wikipedia/pt/thumb/9/9b/Avengers_Endgame.jpg/250px-Avengers_Endgame.jpg',
-        title: 'Avengers',
-        rating: 9.2,
-        year: 2019,
-        description: "Descrição do filme…",
-        isFavorited: false
-    },
-    {
-        img: 'https://upload.wikimedia.org/wikipedia/en/1/17/Doctor_Strange_in_the_Multiverse_of_Madness_poster.jpg',
-        title: 'Doctor Strange',
-        rating: 9.2,
-        year: 2022,
-        description: "Descrição do filme…",
-        isFavorited: false
-    },
-]
+async function getPopularMovies() {
+    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`;
+    const fetchResponse = await fetch(url);
+    const { results } = await fetchResponse.json();
+    return results
+}
 
-window.onload = function () {
+window.onload = async function () {
+
+    const movies = await getPopularMovies('query');
     movies.forEach(movie => renderMovie(movie))
 }
 
 function renderMovie(movie) {
 
-    const { title, img, rating, year, description, isFavorite } = movie;
+    const { title, poster_path, vote_average, release_date, overview, isFavorite } = movie;
+
+    const year = new Date(release_date).getFullYear();
+    const img = `https://image.tmdb.org/t/p/w500${poster_path}`;
 
 
     const movieElement = document.createElement('div');
@@ -73,7 +59,7 @@ function renderMovie(movie) {
     movieRatingImg.src = "img/star.svg";
     movieRatingImg.alt = "star";
     const movieRatingText = document.createElement('span');
-    movieRatingText.textContent = rating;
+    movieRatingText.textContent = vote_average;
     movieActionsRating.appendChild(movieRatingImg);
     movieActionsRating.appendChild(movieRatingText);
 
@@ -111,7 +97,7 @@ function renderMovie(movie) {
     movieDescriptionContainer.classList.add("movie__description-container");
     const movieDescription = document.createElement("p");
     movieDescription.classList.add("movie__description");
-    movieDescription.textContent = "orem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit nam excepturi corrupti cupiditate repellendus nulla expedita voluptate est ipsa omnis eum cum, deserunt ut odit dolore exercitationem nesciunt labore.Voluptates";
+    movieDescription.textContent = overview;
     movieDescriptionContainer.appendChild(movieDescription);
 
     movieElement.appendChild(movieImgAndTitle);
