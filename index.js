@@ -1,4 +1,5 @@
-import { apiKey } from "./environment/key.js"
+import { apiKey } from "./environment/key.js";
+let cont = 0;
 
 const moviesContainer = document.querySelector('.movies-container');
 
@@ -6,13 +7,19 @@ async function getPopularMovies() {
     const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`;
     const fetchResponse = await fetch(url);
     const { results } = await fetchResponse.json();
-    return results
+    return results;
 }
 
 window.onload = async function () {
 
-    const movies = await getPopularMovies('query');
-    movies.forEach(movie => renderMovie(movie))
+    const movies = await getPopularMovies();
+    movies.forEach
+        (movie => {
+            cont++;
+            renderMovie(movie);
+
+        })
+    console.log('contador:  ' + cont);
 }
 
 function renderMovie(movie) {
@@ -86,7 +93,6 @@ function renderMovie(movie) {
     movieActions.appendChild(movieActionsFavorite);
 
 
-
     movieImgAndTitle.appendChild(movieTitleContainer);
 
     /* -----------*/
@@ -107,3 +113,46 @@ function renderMovie(movie) {
 
 }
 
+
+async function getMovieByName(title) {
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-US&page=1&include_adult=false&query=${title}`;
+    const fetchResponse = await fetch(url);
+    const { results } = await fetchResponse.json();
+    return results;
+}
+
+
+const inputSearch = document.getElementById("txtSearch");
+
+inputSearch.addEventListener("keypress", async (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const movies = await getMovieByName(inputSearch.value);
+        clearMovies();
+        movies.forEach(movie => {
+            cont++;
+            renderMovie(movie);
+
+        })
+        console.log('contador 2:  ' + cont);
+    }
+});
+
+const buttonSearch = document.getElementById("buttonSearch");
+
+buttonSearch.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const movies = await getMovieByName(inputSearch.value);
+    clearMovies();
+    movies.forEach(movie => {
+        cont++;
+        renderMovie(movie);
+
+    })
+    console.log('contador 3:  ' + cont);
+
+});
+
+function clearMovies() {
+    moviesContainer.innerHTML = ''
+}
