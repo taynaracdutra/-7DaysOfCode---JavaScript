@@ -1,0 +1,26 @@
+@import "variables";
+
+@import "popular-movies";
+@import "input-search";
+@import "input-favorite";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: white;
+  font-size: 18px;
+}
+
+main {
+  background-color: $background-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin-top: 62px;
+  margin-bottom: 48px;
+  font-size: 36px;
+}
