@@ -1,9 +1,5 @@
 @import "variables";
 
-@import "popular-movies";
-@import "input-search";
-@import "input-favorite";
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -17,6 +13,7 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 100vh;
 }
 
 h1 {
@@ -24,3 +21,7 @@ h1 {
   margin-bottom: 48px;
   font-size: 36px;
 }
+
+@import "popular-movies";
+@import "input-search";
+@import "input-favorite";

@@ -10,14 +10,18 @@ async function getPopularMovies() {
     return results;
 }
 
-window.onload = async function () {
-
+async function loadAllPopularMovies() {
     const movies = await getPopularMovies();
     movies.forEach
         (movie => {
             renderMovie(movie);
 
-        })
+        });
+}
+
+window.onload = function () {
+    loadAllPopularMovies();
+
 }
 
 function renderMovie(movie) {
@@ -76,7 +80,6 @@ function renderMovie(movie) {
     buttonFavorite.classList.add('movie__buttonFavorite');
     buttonFavorite.addEventListener('click', (event) => favoriteButtonPressed(event, movie));
     const favoriteImg = document.createElement('img');
-    // movieFavoriteImg.id = "movie__imgFavorite";
     favoriteImg.src = isFavorited ? 'img/isFavorite.svg' : 'img/notFavorite.svg';
     buttonFavorite.appendChild(favoriteImg);
     const favoriteText = document.createElement('span');
@@ -139,7 +142,6 @@ buttonSearch.addEventListener("click", async (event) => {
     clearMovies();
     movies.forEach(movie => {
         renderMovie(movie);
-
     })
 });
 
@@ -188,3 +190,19 @@ function removeFromLocalStorage(id) {
     const newMovies = movies.filter(movie => movie.id != findMovie.id);
     localStorage.setItem('favoriteMovies', JSON.stringify(newMovies));
 }
+
+const checkFavoritedMovies = document.getElementById("check-favoritedMovies");
+
+checkFavoritedMovies.addEventListener("change", (event) => {
+    event.preventDefault();
+
+    if (event.target.checked) {
+        const movies = getFavoriteMovies() || [];
+        clearMovies();
+
+        movies.forEach(movie => { renderMovie(movie) });
+    } else {
+        clearMovies();
+        loadAllPopularMovies();
+    }
+})
