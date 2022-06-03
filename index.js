@@ -15,19 +15,18 @@ window.onload = async function () {
     const movies = await getPopularMovies();
     movies.forEach
         (movie => {
-            cont++;
             renderMovie(movie);
 
         })
-    console.log('contador:  ' + cont);
 }
 
 function renderMovie(movie) {
 
-    const { title, poster_path, vote_average, release_date, overview, isFavorite } = movie;
+    const { id, title, poster_path, vote_average, release_date, overview } = movie;
 
     const year = new Date(release_date).getFullYear();
     const img = `https://image.tmdb.org/t/p/w500${poster_path}`;
+    const isFavorited = checkMovieIsFavorited(id);
 
 
     const movieElement = document.createElement('div');
@@ -41,7 +40,7 @@ function renderMovie(movie) {
     movieImgAndTitle.classList.add("movie__img-and-title");
 
     const movieImgContainer = document.createElement('div');
-    movieImgContainer.classList.add("movie__img-container");
+    movieImgContainer.classList.add("movie__img");
     const movieImg = document.createElement('img');
     movieImg.src = img;
     movieImg.alt = `${title} Poster`;
@@ -50,7 +49,7 @@ function renderMovie(movie) {
     movieImgAndTitle.appendChild(movieImgContainer);
 
     const movieTitleContainer = document.createElement('div');
-    movieTitleContainer.classList.add("movie__title-container");
+    movieTitleContainer.classList.add("movie__title-and-actions");
     const movieTitle = document.createElement('h3');
     movieTitle.classList.add("movie__title");
     movieTitle.textContent = `${title} (${year})`;
@@ -61,7 +60,7 @@ function renderMovie(movie) {
     movieTitleContainer.appendChild(movieActions);
 
     const movieActionsRating = document.createElement('div');
-    movieActionsRating.classList.add('movie__actions__rating');
+    movieActionsRating.classList.add('movie__rating');
     const movieRatingImg = document.createElement('img');
     movieRatingImg.src = "img/star.svg";
     movieRatingImg.alt = "star";
@@ -72,22 +71,18 @@ function renderMovie(movie) {
 
 
     const movieActionsFavorite = document.createElement('div');
-    movieActionsFavorite.classList.add('movie__actions__favorite');
-    const buttonFavorite = document.createElement('a');
-    const movieFavoriteImg = document.createElement('img');
-
-    if (isFavorite) {
-        movieFavoriteImg.src = "img/isFavorite.svg";
-    } else {
-        movieFavoriteImg.src = "img/favorite.svg";
-    }
-
-    buttonFavorite.appendChild(movieFavoriteImg);
-
-    const movieFavoriteText = document.createElement('span');
-    movieFavoriteText.textContent = "Favoritar";
+    movieActionsFavorite.classList.add('movie__favorite');
+    const buttonFavorite = document.createElement('button');
+    buttonFavorite.classList.add('movie__buttonFavorite');
+    buttonFavorite.addEventListener('click', (event) => favoriteButtonPressed(event, movie));
+    const favoriteImg = document.createElement('img');
+    // movieFavoriteImg.id = "movie__imgFavorite";
+    favoriteImg.src = isFavorited ? 'img/isFavorite.svg' : 'img/notFavorite.svg';
+    buttonFavorite.appendChild(favoriteImg);
+    const favoriteText = document.createElement('span');
+    favoriteText.textContent = "Favoritar";
     movieActionsFavorite.appendChild(buttonFavorite);
-    movieActionsFavorite.appendChild(movieFavoriteText);
+    movieActionsFavorite.appendChild(favoriteText);
 
     movieActions.appendChild(movieActionsRating);
     movieActions.appendChild(movieActionsFavorite);
@@ -130,11 +125,9 @@ inputSearch.addEventListener("keypress", async (event) => {
         const movies = await getMovieByName(inputSearch.value);
         clearMovies();
         movies.forEach(movie => {
-            cont++;
             renderMovie(movie);
 
         })
-        console.log('contador 2:  ' + cont);
     }
 });
 
@@ -145,14 +138,53 @@ buttonSearch.addEventListener("click", async (event) => {
     const movies = await getMovieByName(inputSearch.value);
     clearMovies();
     movies.forEach(movie => {
-        cont++;
         renderMovie(movie);
 
     })
-    console.log('contador 3:  ' + cont);
-
 });
 
 function clearMovies() {
     moviesContainer.innerHTML = ''
+}
+
+
+function favoriteButtonPressed(event, movie) {
+    const favoriteState = {
+        favorited: 'img/isFavorite.svg',
+        notFavorited: 'img/notFavorite.svg'
+    }
+
+    if (event.target.src.includes(favoriteState.notFavorited)) {
+        // aqui ele será favoritado
+        event.target.src = favoriteState.favorited;
+        saveToLocalStorage(movie);
+    } else {
+        // aqui ele será desfavoritado
+        event.target.src = favoriteState.notFavorited
+        removeFromLocalStorage(movie.id)
+    }
+}
+
+function getFavoriteMovies() {
+    return JSON.parse(localStorage.getItem('favoriteMovies'));
+}
+
+function saveToLocalStorage(movie) {
+    const movies = getFavoriteMovies() || [];
+    movies.push(movie);
+
+    const moviesJSON = JSON.stringify(movies);
+    localStorage.setItem('favoriteMovies', moviesJSON);
+}
+
+function checkMovieIsFavorited(id) {
+    const movies = getFavoriteMovies() || [];
+    return movies.find(movie => movie.id == id);
+}
+
+function removeFromLocalStorage(id) {
+    const movies = getFavoriteMovies() || [];
+    const findMovie = movies.find(movie => movie.id == id);
+    const newMovies = movies.filter(movie => movie.id != findMovie.id);
+    localStorage.setItem('favoriteMovies', JSON.stringify(newMovies));
 }

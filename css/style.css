@@ -20,7 +20,7 @@
   align-items: center;
   gap: 40px;
 }
-.movies-container .movie__img-container img {
+.movies-container .movie__img img {
   width: 139px;
   height: 139px;
   -o-object-fit: cover;
@@ -36,10 +36,12 @@
   justify-content: space-between;
   width: 200px;
 }
-.movies-container .movie__actions a {
+.movies-container .movie__actions button {
   cursor: pointer;
+  background-color: transparent;
+  border: none;
 }
-.movies-container .movie__actions__rating, .movies-container .movie__actions__favorite {
+.movies-container .movie__rating, .movies-container .movie__favorite {
   height: 35px;
   display: flex;
   align-items: center;

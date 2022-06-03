@@ -33,7 +33,7 @@
       gap: 40px;
     }
 
-    &__img-container {
+    &__img {
       img {
         width: 139px;
         height: 139px;
@@ -51,17 +51,19 @@
       justify-content: space-between;
       width: 200px;
 
-      a {
+      button {
         cursor: pointer;
+        background-color: transparent;
+        border: none;
       }
+    }
 
-      &__rating,
-      &__favorite {
-        height: 35px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+    &__rating,
+    &__favorite {
+      height: 35px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     &__description-container {
