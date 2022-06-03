@@ -1,17 +1,12 @@
-import { apiKey } from "./environment/key.js";
-let cont = 0;
+import { API } from "./services/api.js";
+import { LocalStorage } from "./services/localStorage.js"
+
+
 
 const moviesContainer = document.querySelector('.movies-container');
 
-async function getPopularMovies() {
-    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=en-US&page=1`;
-    const fetchResponse = await fetch(url);
-    const { results } = await fetchResponse.json();
-    return results;
-}
-
 async function loadAllPopularMovies() {
-    const movies = await getPopularMovies();
+    const movies = await API.getPopularMovies();
     movies.forEach
         (movie => {
             renderMovie(movie);
@@ -30,7 +25,7 @@ function renderMovie(movie) {
 
     const year = new Date(release_date).getFullYear();
     const img = `https://image.tmdb.org/t/p/w500${poster_path}`;
-    const isFavorited = checkMovieIsFavorited(id);
+    const isFavorited = LocalStorage.checkMovieIsFavorited(id);
 
 
     const movieElement = document.createElement('div');
@@ -108,15 +103,6 @@ function renderMovie(movie) {
     movieElement.appendChild(movieDescriptionContainer);
 
     /* -----------*/
-
-}
-
-
-async function getMovieByName(title) {
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-US&page=1&include_adult=false&query=${title}`;
-    const fetchResponse = await fetch(url);
-    const { results } = await fetchResponse.json();
-    return results;
 }
 
 
@@ -125,7 +111,7 @@ const inputSearch = document.getElementById("txtSearch");
 inputSearch.addEventListener("keypress", async (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
-        const movies = await getMovieByName(inputSearch.value);
+        const movies = await API.getMovieByName(inputSearch.value);
         clearMovies();
         movies.forEach(movie => {
             renderMovie(movie);
@@ -159,36 +145,12 @@ function favoriteButtonPressed(event, movie) {
     if (event.target.src.includes(favoriteState.notFavorited)) {
         // aqui ele será favoritado
         event.target.src = favoriteState.favorited;
-        saveToLocalStorage(movie);
+        LocalStorage.saveToLocalStorage(movie);
     } else {
         // aqui ele será desfavoritado
         event.target.src = favoriteState.notFavorited
-        removeFromLocalStorage(movie.id)
+        LocalStorage.removeFromLocalStorage(movie.id)
     }
-}
-
-function getFavoriteMovies() {
-    return JSON.parse(localStorage.getItem('favoriteMovies'));
-}
-
-function saveToLocalStorage(movie) {
-    const movies = getFavoriteMovies() || [];
-    movies.push(movie);
-
-    const moviesJSON = JSON.stringify(movies);
-    localStorage.setItem('favoriteMovies', moviesJSON);
-}
-
-function checkMovieIsFavorited(id) {
-    const movies = getFavoriteMovies() || [];
-    return movies.find(movie => movie.id == id);
-}
-
-function removeFromLocalStorage(id) {
-    const movies = getFavoriteMovies() || [];
-    const findMovie = movies.find(movie => movie.id == id);
-    const newMovies = movies.filter(movie => movie.id != findMovie.id);
-    localStorage.setItem('favoriteMovies', JSON.stringify(newMovies));
 }
 
 const checkFavoritedMovies = document.getElementById("check-favoritedMovies");
@@ -197,7 +159,7 @@ checkFavoritedMovies.addEventListener("change", (event) => {
     event.preventDefault();
 
     if (event.target.checked) {
-        const movies = getFavoriteMovies() || [];
+        const movies = LocalStorage.getFavoriteMovies() || [];
         clearMovies();
 
         movies.forEach(movie => { renderMovie(movie) });
